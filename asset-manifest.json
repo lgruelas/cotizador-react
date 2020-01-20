@@ -1,26 +1,26 @@
 {
   "files": {
-    "main.css": "/cotizador/static/css/main.abebb69a.chunk.css",
-    "main.js": "/cotizador/static/js/main.c2fe699e.chunk.js",
-    "main.js.map": "/cotizador/static/js/main.c2fe699e.chunk.js.map",
-    "runtime-main.js": "/cotizador/static/js/runtime-main.ef425e2e.js",
-    "runtime-main.js.map": "/cotizador/static/js/runtime-main.ef425e2e.js.map",
-    "static/css/2.9ecc95fd.chunk.css": "/cotizador/static/css/2.9ecc95fd.chunk.css",
-    "static/js/2.da61cdb1.chunk.js": "/cotizador/static/js/2.da61cdb1.chunk.js",
-    "static/js/2.da61cdb1.chunk.js.map": "/cotizador/static/js/2.da61cdb1.chunk.js.map",
-    "index.html": "/cotizador/index.html",
-    "precache-manifest.22acfc946586bb4aad4acaf6ef44e3e7.js": "/cotizador/precache-manifest.22acfc946586bb4aad4acaf6ef44e3e7.js",
-    "service-worker.js": "/cotizador/service-worker.js",
-    "static/css/2.9ecc95fd.chunk.css.map": "/cotizador/static/css/2.9ecc95fd.chunk.css.map",
-    "static/css/main.abebb69a.chunk.css.map": "/cotizador/static/css/main.abebb69a.chunk.css.map",
-    "static/js/2.da61cdb1.chunk.js.LICENSE": "/cotizador/static/js/2.da61cdb1.chunk.js.LICENSE",
-    "static/media/planet.png": "/cotizador/static/media/planet.2e71a093.png"
+    "main.css": "/cotizador-react/static/css/main.abebb69a.chunk.css",
+    "main.js": "/cotizador-react/static/js/main.e0e2cc1b.chunk.js",
+    "main.js.map": "/cotizador-react/static/js/main.e0e2cc1b.chunk.js.map",
+    "runtime-main.js": "/cotizador-react/static/js/runtime-main.9fa3744d.js",
+    "runtime-main.js.map": "/cotizador-react/static/js/runtime-main.9fa3744d.js.map",
+    "static/css/2.9ecc95fd.chunk.css": "/cotizador-react/static/css/2.9ecc95fd.chunk.css",
+    "static/js/2.da61cdb1.chunk.js": "/cotizador-react/static/js/2.da61cdb1.chunk.js",
+    "static/js/2.da61cdb1.chunk.js.map": "/cotizador-react/static/js/2.da61cdb1.chunk.js.map",
+    "index.html": "/cotizador-react/index.html",
+    "precache-manifest.b34966acc4db70d77081ef51385c03c5.js": "/cotizador-react/precache-manifest.b34966acc4db70d77081ef51385c03c5.js",
+    "service-worker.js": "/cotizador-react/service-worker.js",
+    "static/css/2.9ecc95fd.chunk.css.map": "/cotizador-react/static/css/2.9ecc95fd.chunk.css.map",
+    "static/css/main.abebb69a.chunk.css.map": "/cotizador-react/static/css/main.abebb69a.chunk.css.map",
+    "static/js/2.da61cdb1.chunk.js.LICENSE": "/cotizador-react/static/js/2.da61cdb1.chunk.js.LICENSE",
+    "static/media/planet.png": "/cotizador-react/static/media/planet.2e71a093.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.ef425e2e.js",
+    "static/js/runtime-main.9fa3744d.js",
     "static/css/2.9ecc95fd.chunk.css",
     "static/js/2.da61cdb1.chunk.js",
     "static/css/main.abebb69a.chunk.css",
-    "static/js/main.c2fe699e.chunk.js"
+    "static/js/main.e0e2cc1b.chunk.js"
   ]
 }
