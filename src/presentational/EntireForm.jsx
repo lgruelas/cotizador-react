@@ -4,7 +4,6 @@ import axios from 'axios';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import planet from './../planet.png';
-//import BootstrapTable, {TableHeaderColumn} from 'react-bootstrap-table';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/css/react-bootstrap-table.css';
 
@@ -212,21 +211,6 @@ class EntireForm extends React.Component {
         })
     };
 
-    priceFormatter(cell, row) {
-        return `<i class='glyphicon glyphicon-usd'></i> ${cell}`;
-    }
-
-    getTotalPayAfter() {
-        console.log("llamando")
-        let total = 0;
-        console.log(total)
-        this.state.products.forEach(product => {
-            total += product.pay_after;
-        });
-        console.log(total)
-        return total;
-    }
-
     handleChange(e) {
         if (e.target.id == 'quote' ) {
             for (let i = 1; i <= 5; i++) {
@@ -238,113 +222,6 @@ class EntireForm extends React.Component {
     }
 
     render() {
-        const columns = [{
-            dataField: 'month',
-            text: 'Mes',
-            editable: false
-        }, {
-            dataField: 'hours',
-            text: 'Horas irradiación'
-        }, {
-            dataField: 'consume',
-            text: 'Consumo'
-        },{
-            dataField: 'production',
-            text: 'Producción'
-        }, {
-            dataField: 'pay_before',
-            text: 'Pago antes'
-        }, {
-            dataField: 'pay_after',
-            text: 'Pago con energía solar'
-        }];
-        var productso = [
-            {
-                month: 'Enero',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Febrero',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Marzo',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Abril',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Mayo',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Junio',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Julio',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Agosto',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Septiembre',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Octubre',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Noviembre',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            },{
-                month: 'Diciembre',
-                hours: '',
-                consume: '',
-                production: '',
-                pay_before: '',
-                pay_after: ''
-            }
-        ];
         const cellEditProp = {
             mode: 'click',
             blurToSave: true,
