@@ -6,6 +6,7 @@ import FormControl from 'react-bootstrap/FormControl';
 import planet from './../planet.png';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/css/react-bootstrap-table.css';
+import { months_temp, pay_before_temp_costs_domestic_1 } from './variablesDomestic';
 
 class EntireForm extends React.Component {
     constructor(props) {
@@ -26,6 +27,8 @@ class EntireForm extends React.Component {
             total: "",
             savings: "",
             anual: "25 años",
+            sistema_solar: "",
+            eficiencia: "",
             invest_return: "",
             client: "",
             service: "",
@@ -41,6 +44,8 @@ class EntireForm extends React.Component {
             invest_return_big: "",
             subtotal_usd: "",
             iva_usd: "",
+            saved_co2: 0,
+            saved_trees: 0,
             total_usd: "",
             total_mxn: "",
             currency_rate: "",
@@ -60,7 +65,7 @@ class EntireForm extends React.Component {
             quantity7: "",
             description7: "",
             panel_quantity: "",
-            products: [
+            table: [
                 {
                     month: 'Enero',
                     hours: '',
@@ -146,10 +151,15 @@ class EntireForm extends React.Component {
                     pay_before: '',
                     pay_after: ''
                 }
-            ]
+            ],
+            totals: ["0.00", "0.00", "0.00", "0.00", "0.00"],
+            tarifa: "1"
         }
+        this.pay_before_temps = pay_before_temp_costs_domestic_1;
+        console.log(this.pay_before_table)
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeSelect = this.handleChangeSelect.bind(this);
     }
 
     componentDidMount() {
@@ -167,32 +177,62 @@ class EntireForm extends React.Component {
             style: 'currency',
             currency: 'USD',
         });
-        console.log(dict["total_usd"]);
+        let savings = parseFloat(this.state.totals[3]) - parseFloat(this.state.totals[4]);
         let usd_value = parseFloat(dict["total_usd"]);
-        let currency_factor = dict["usd_rate"] == 0 ? parseFloat(dict["currency_rate"]) : parseFloat(dict["usd_rate"]);
+        let currency_factor = dict["usd_rate"] === 0 ? parseFloat(dict["currency_rate"]) : parseFloat(dict["usd_rate"]);
+        let watts = parseInt(dict["panel_power"]) * parseInt(dict["panels"]) / 1000;
         dict["subtotal_usd"] = formatter.format(usd_value / 1.16);
         dict["iva_usd"] = formatter.format(usd_value*0.16);
         dict["total_mxn"] = formatter.format(usd_value*currency_factor);
         dict["total_big"] = dict["total_mxn"];
         dict["total"] = dict["total_mxn"];
         dict["total_usd"] = formatter.format(dict["total_usd"]);
-        dict["panel_quantity"] = parseInt(dict["panels"]).toFixed(2);
+        dict["panel_quantity"] = dict["panels"];
         dict["panel_desc"] = `${dict["panel_desc"]} ${dict["panel_power"]} watts`;
-        dict["power"] = `${(parseInt(dict["panel_power"]) * parseInt(dict["panels"]) / 1000).toFixed(2)} KWp`
+        dict["power"] = `${(watts).toFixed(2)} KWp`
         dict["panel_power"] = `De ${dict["panel_power"]} Wp`;
         dict["panels"] = `${dict["panels"]} paneles`;
-        for (let i = 1; i <= 7; i++) {
+        dict["saved_co2"] = (watts*0.78).toFixed(3);
+        dict["saved_trees"] = formatter.format(watts*11.7).slice(1,-3);
+        /*for (let i = 1; i <= 7; i++) {
             if (dict[`quantity${i}`]) {
                 dict[`quantity${i}`] = parseInt(dict[`quantity${i}`]).toFixed(2);
             }
-        }
-        console.log(dict);
+        }*/
+        dict["savings"] = formatter.format(savings);
+        dict["invest_return"] = `${(parseFloat(this.state.totals[4])/savings).toFixed(1)} años`;
+        dict["anual_pay_solar"] = formatter.format(parseFloat(this.state.totals[4]));
+        dict["anual_pay_actual"] = formatter.format(parseFloat(this.state.totals[3]));
+        dict["savings_chart"] = dict["savings"];
+        dict["savings_proportion"] = `${Math.round((savings/parseFloat(this.state.totals[3]))*100)}%`;
+        dict["invest_return_big"] = dict["invest_return"];
+        this.formatDictTable(dict["table"], formatter);
+        this.formatDictTotals(dict["totals"], formatter);
+    }
+
+    formatDictTable(tabla, formatter) {
+        tabla = tabla.map(element => {
+            element.production = `${formatter.format(element.production).slice(1)}KWh`;
+            element.consume = `${formatter.format(element.consume).slice(1)}KWh`;
+            element.pay_before = `${formatter.format(element.pay_before)} MXN`;
+            element.pay_after = `${formatter.format(element.pay_after)} MXN`;
+        });
+    }
+
+    formatDictTotals(lista, formatter) {
+        lista[1] = `${formatter.format(lista[1]).slice(1)}KWh`;
+        lista[2] = `${formatter.format(lista[2]).slice(1)}KWh`;
+        lista[3] = `${formatter.format(lista[3])} MXN`;
+        lista[4] = `${formatter.format(lista[4])} MXN`;
     }
 
     handleSubmit() {
-        let to_send = this.state;
+        let to_send = {...this.state};
+        to_send.table = this.state.table.map(e => ({...e}));
+        to_send.totals = this.state.totals.map(e => ({...e}))
+
         this.format_output(to_send);
-        axios.post(`http://127.0.0.1:5000/generate`, to_send, {
+        axios.post(`https://57d3a4c2.ngrok.io/generate`, to_send, {
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow_Origin': '*',
@@ -212,7 +252,7 @@ class EntireForm extends React.Component {
     };
 
     handleChange(e) {
-        if (e.target.id == 'quote' ) {
+        if (e.target.id === 'quote' ) {
             for (let i = 1; i <= 5; i++) {
                 this.setState({[`${e.target.id}${i}`]: `No. de cotización: ${e.target.value}`});
             }
@@ -221,11 +261,137 @@ class EntireForm extends React.Component {
         }
     }
 
+    calculateProduction(row, new_totals) {
+        if (this.state.sistema_solar && this.state.eficiencia) {
+            let new_value = "";
+            new_value = Math.round(parseFloat(row["hours"])*parseFloat(this.state.sistema_solar)*parseFloat(this.state.eficiencia)*31);
+            new_totals[2] = this.calculateNewTotal("production", row.month, new_value);
+            if (row.pay_before) {
+                let payAfter = this.calculatePayAfter(row);
+                new_totals[4] = this.calculateNewTotal("pay_after", row.month, payAfter);
+                this.setState(oldState => ({
+                    totals: new_totals,
+                    table: oldState.table.map(
+                        el => el.month === row.month? { ...el, production: new_value , pay_after: payAfter }: el
+                    )
+                }));
+            } else {
+                this.setState(oldState => ({
+                    totals: new_totals,
+                    table: oldState.table.map(
+                        el => el.month === row.month? { ...el, production: new_value }: el
+                    )
+                }));
+            }
+        } else {
+            this.setState({totals: new_totals});
+        }
+    }
+
+    calculatePayBefore(row, new_totals) {
+        let consume = parseFloat(row.consume);
+        let overhead = 0;
+        let to_pay = 0;
+        let tmp_row = {
+            bajo: consume > this.pay_before_temps[months_temp[row.month]].cantidad_bajo? this.pay_before_temps[months_temp[row.month]].cantidad_bajo : 0,
+            intermedio: 0,
+            intermedio_alto: 0
+        }
+        if (months_temp[row.month] === 0) {
+            tmp_row.intermedio = consume - tmp_row.bajo > 150 ? this.pay_before_temps[0].intermedio : 0;
+            let bi = tmp_row.intermedio + tmp_row.bajo;
+            overhead = consume > bi ? consume - bi : 0;
+            to_pay = this.pay_before_temps[0].consumo_bajo*tmp_row.bajo + this.pay_before_temps[0].intermedio*tmp_row.intermedio + this.pay_before_temps[0].excedente*overhead;
+        } else {
+            tmp_row.intermedio = consume - tmp_row.bajo > 300 ? this.pay_before_temps[1].intermedio : consume - tmp_row.bajo;
+            tmp_row.intermedio_alto = Math.max(consume - tmp_row.bajo - tmp_row.intermedio, this.pay_before_temps[1].cantidad_intermedio_alto);
+            let bii = tmp_row.intermedio + tmp_row.intermedio_alto + tmp_row.bajo;
+            overhead = consume > bii ? consume - bii : 0;
+            to_pay = this.pay_before_temps[1].consumo_bajo*tmp_row.bajo + this.pay_before_temps[1].intermedio*tmp_row.intermedio + this.pay_before_temps[1].excedente*overhead + this.pay_before_temps[1].intermedio_alto*tmp_row.intermedio_alto;
+        };
+        let new_value = Math.round(to_pay);
+        new_totals[3] = this.calculateNewTotal("pay_before", row.month, new_value);
+        if (row.production>1000000) {
+            let payAfter = this.calculatePayAfter(row);
+            new_totals[4] = this.calculateNewTotal("pay_after", row.month, payAfter);
+            this.setState(oldState => ({
+                totals: new_totals,
+                table: oldState.table.map(
+                    el => el.month === row.month? { ...el, pay_before: new_value, pay_after: payAfter }: el
+                )
+            }));
+        } else {
+            this.setState(oldState => ({
+                totals: new_totals,
+                table: oldState.table.map(
+                    el => el.month === row.month? { ...el, pay_before: new_value }: el
+                )
+            }));
+        }
+    }
+
+    calculatePayAfter(row) {
+
+    }
+
+    calculateNewTotal(column, month, value) {
+        month = month || "not_assigned";
+        let total = 0;
+        this.state.table.forEach(element => {
+            if (element.month === month) {
+                total += value;
+            } else if (element[column]) {
+                total += parseFloat(element[column]);
+            }
+        });
+        return total;
+    }
+
+    forceUpdate(row, column) {
+        let new_totals = this.state.totals;
+        let total = this.calculateNewTotal(column);
+        switch(column) {
+            case 'hours':
+                new_totals[0] = (total/12.0).toFixed(2);
+                //this.calculateProduction(row, new_totals);
+                this.setState({totals: new_totals});
+                break;
+            case 'consume':
+                new_totals[1] = (total).toFixed(2);
+                //this.calculatePayBefore(row, new_totals);
+                this.setState({totals: new_totals});
+                break;
+            case 'pay_before':
+                new_totals[3] = (total).toFixed(2);
+                this.setState({totals: new_totals});
+                break;
+            case 'pay_after':
+                new_totals[4] = (total).toFixed(2);
+                this.setState({totals: new_totals});
+                break;
+            case 'production':
+                new_totals[2] = (total).toFixed(2);
+                this.setState({totals: new_totals});
+                break;
+        }
+    }
+
+    handleChangeSelect(e) {
+        let new_rate = e.target.value;
+        this.setState(oldState => ({
+            totals: oldState.totals.slice(0,3).concat(["0.00", "0.00"]),
+            tarifa: new_rate,
+            table: oldState.table.map(
+                el => ({ ...el, pay_before: "", pay_after: "" })
+            )
+        }));
+    }
+
     render() {
         const cellEditProp = {
             mode: 'click',
             blurToSave: true,
-            afterSaveCell: () => {console.log(this.state);}
+            afterSaveCell: (row, column) => {this.forceUpdate(row, column)}
         };
         return (
             <div className="container">
@@ -234,23 +400,23 @@ class EntireForm extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-md-8 order-md-2 mb-4">
-                    <BootstrapTable data={ this.state.products } tableHeaderClass={"thead-dark"} cellEdit={cellEditProp}>
+                    <BootstrapTable data={ this.state.table } tableHeaderClass={"thead-dark"} cellEdit={cellEditProp}>
                         <TableHeaderColumn dataField='month' isKey>Mes</TableHeaderColumn>
                         <TableHeaderColumn dataField='hours'>Horas de irradiación</TableHeaderColumn>
                         <TableHeaderColumn dataField='consume'>Consumo</TableHeaderColumn>
-                        <TableHeaderColumn dataField='production'>Producción</TableHeaderColumn>
-                        <TableHeaderColumn dataField='pay_before'>Pago antes</TableHeaderColumn>
-                        <TableHeaderColumn dataField='pay_after'>Pago con energía solar</TableHeaderColumn>
+                        <TableHeaderColumn dataField='production' editable={true}>Producción</TableHeaderColumn>
+                        <TableHeaderColumn dataField='pay_before' editable={true}>Pago antes</TableHeaderColumn>
+                        <TableHeaderColumn dataField='pay_after' editable={true}>Pago con energía solar</TableHeaderColumn>
                     </BootstrapTable>
                         <table className="table">
                             <thead className="thead-light">
                                 <tr>
                                     <th scope="col">Total</th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
+                                    <th scope="col">{this.state.totals[0]}</th>
+                                    <th scope="col">{this.state.totals[1]}</th>
+                                    <th scope="col">{this.state.totals[2]}</th>
+                                    <th scope="col">{this.state.totals[3]}</th>
+                                    <th scope="col">{this.state.totals[4]}</th>
                                 </tr>
                             </thead>
                         </table>
@@ -267,7 +433,7 @@ class EntireForm extends React.Component {
 
                         <label htmlFor="client">Cliente</label>
                         <InputGroup className="mb-3">
-                            <FormControl onChange={this.handleChange} id="client" />
+                            <FormControl onChange={this.handleChange} value={this.state.client} id="client" />
                         </InputGroup>
 
                         <label htmlFor="direccion">Direccion</label>
@@ -297,30 +463,32 @@ class EntireForm extends React.Component {
 
                         <div className="row mb-3">
                             <div className="col-md-12 mb-3">
-                                <label for="tarifa">Tipo de tarifa</label>
-                                <select id="tarifa" className="browser-default custom-select">
-                                    <option selected>1</option>
-                                    <option value="1">1A</option>
-                                    <option value="2">1B</option>
-                                    <option value="3">1C</option>
-                                    <option value="1">1D</option>
-                                    <option value="2">1E</option>
-                                    <option value="3">1F</option>
-                                    <option value="3">PDBT</option>
+                                <label htmlFor="tarifa">Tipo de tarifa</label>
+                                <select onChange={this.handleChangeSelect} value={this.state.tarifa} id="tarifa" className="browser-default custom-select">
+                                    <option value="1">1</option>
+                                    <option value="1A">1A</option>
+                                    <option value="1B">1B</option>
+                                    <option value="1C">1C</option>
+                                    <option value="1D">1D</option>
+                                    <option value="1E">1E</option>
+                                    <option value="1F">1F</option>
+                                    <option value="PDBT">PDBT</option>
+                                    <option value="GDMTH">GDMTH</option>
+                                    <option value="GDMTO">GDMTO</option>
                                 </select>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-md-6 mb-3">
-                                <label htmlFor="sistema-solar">Sistema solar</label>
+                                <label htmlFor="sistema_solar">Sistema solar</label>
                                 <InputGroup className="mb-3">
-                                    <FormControl id="sistema-solar" />
+                                    <FormControl onChange={this.handleChange} id="sistema_solar" />
                                 </InputGroup>
                             </div>
                             <div className="col-md-6 mb-3">
                                 <label htmlFor="eficiencia">Eficienca</label>
                                 <InputGroup className="mb-3">
-                                    <FormControl id="eficiencia" />
+                                    <FormControl onChange={this.handleChange} id="eficiencia" />
                                 </InputGroup>
                             </div>
                         </div>
@@ -339,10 +507,10 @@ class EntireForm extends React.Component {
                 <br />
                 <div className="row">
                     <div className="col-2">
-                        <label for="inversor">Paneles</label>
+                        <label htmlFor="inversor">Paneles</label>
                     </div>
                     <InputGroup className="mb-3 col-2">
-                        <FormControl onChange={this.handleChange} id="panels" type="number" step="any"/>
+                        <FormControl onChange={this.handleChange} id="panels" type="number"/>
                     </InputGroup>
                     <InputGroup className="mb-3 col-6">
                         <FormControl onChange={this.handleChange} id="panel_desc" type="text"/>
@@ -353,10 +521,10 @@ class EntireForm extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-2">
-                        <label for="inversor"></label>
+                        <label htmlFor="inversor"></label>
                     </div>
                     <InputGroup className="mb-3 col-2">
-                        <FormControl onChange={this.handleChange} id="quantity1" type="number" step="any"/>
+                        <FormControl onChange={this.handleChange} id="quantity1" type="number"/>
                     </InputGroup>
                     <InputGroup className="mb-3 col-8">
                         <FormControl onChange={this.handleChange} id="description1" type="text"/>
@@ -364,10 +532,10 @@ class EntireForm extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-2">
-                        <label for="inversor"></label>
+                        <label htmlFor="inversor"></label>
                     </div>
                     <InputGroup className="mb-3 col-2">
-                        <FormControl onChange={this.handleChange} id="quantity2" type="number" step="any"/>
+                        <FormControl onChange={this.handleChange} id="quantity2" type="number"/>
                     </InputGroup>
                     <InputGroup className="mb-3 col-8">
                         <FormControl onChange={this.handleChange} id="description2" type="text"/>
@@ -375,10 +543,10 @@ class EntireForm extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-2">
-                        <label for="inversor"></label>
+                        <label htmlFor="inversor"></label>
                     </div>
                     <InputGroup className="mb-3 col-2">
-                        <FormControl onChange={this.handleChange} id="quantity3" type="number" step="any"/>
+                        <FormControl onChange={this.handleChange} id="quantity3" type="number"/>
                     </InputGroup>
                     <InputGroup className="mb-3 col-8">
                         <FormControl onChange={this.handleChange} id="description3" type="text"/>
@@ -386,10 +554,10 @@ class EntireForm extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-2">
-                        <label for="inversor"></label>
+                        <label htmlFor="inversor"></label>
                     </div>
                     <InputGroup className="mb-3 col-2">
-                        <FormControl onChange={this.handleChange} id="quantity4" type="number" step="any"/>
+                        <FormControl onChange={this.handleChange} id="quantity4" type="number"/>
                     </InputGroup>
                     <InputGroup className="mb-3 col-8">
                         <FormControl onChange={this.handleChange} id="description4" type="text"/>
@@ -397,10 +565,10 @@ class EntireForm extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-2">
-                        <label for="inversor"></label>
+                        <label htmlFor="inversor"></label>
                     </div>
                     <InputGroup className="mb-3 col-2">
-                        <FormControl onChange={this.handleChange} id="quantity5" type="number" step="any"/>
+                        <FormControl onChange={this.handleChange} id="quantity5" type="number"/>
                     </InputGroup>
                     <InputGroup className="mb-3 col-8">
                         <FormControl onChange={this.handleChange} id="description5" type="text"/>
@@ -408,10 +576,10 @@ class EntireForm extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-2">
-                        <label for="inversor"></label>
+                        <label htmlFor="inversor"></label>
                     </div>
                     <InputGroup className="mb-3 col-2">
-                        <FormControl onChange={this.handleChange} id="quantity6" type="number" step="any"/>
+                        <FormControl onChange={this.handleChange} id="quantity6" type="number"/>
                     </InputGroup>
                     <InputGroup className="mb-3 col-8">
                         <FormControl onChange={this.handleChange} id="description6" type="text"/>
@@ -419,10 +587,10 @@ class EntireForm extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-2">
-                        <label for="inversor"></label>
+                        <label htmlFor="inversor"></label>
                     </div>
                     <InputGroup className="mb-3 col-2">
-                        <FormControl onChange={this.handleChange} id="quantity7" type="number" step="any"/>
+                        <FormControl onChange={this.handleChange} id="quantity7" type="number"/>
                     </InputGroup>
                     <InputGroup className="mb-3 col-8">
                         <FormControl onChange={this.handleChange} id="description7" type="text"/>
