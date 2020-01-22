@@ -7,6 +7,7 @@ import planet from './../planet.png';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/css/react-bootstrap-table.css';
 import { months_temp, pay_before_temp_costs_domestic_1 } from './variablesDomestic';
+import { sun } from './horasSol';
 
 class EntireForm extends React.Component {
     constructor(props) {
@@ -194,13 +195,8 @@ class EntireForm extends React.Component {
         dict["panels"] = `${dict["panels"]} paneles`;
         dict["saved_co2"] = (watts*0.78).toFixed(3);
         dict["saved_trees"] = formatter.format(watts*11.7).slice(1,-3);
-        /*for (let i = 1; i <= 7; i++) {
-            if (dict[`quantity${i}`]) {
-                dict[`quantity${i}`] = parseInt(dict[`quantity${i}`]).toFixed(2);
-            }
-        }*/
         dict["savings"] = formatter.format(savings);
-        dict["invest_return"] = `${(parseFloat(this.state.totals[4])/savings).toFixed(1)} años`;
+        dict["invest_return"] = `${(usd_value*currency_factor/savings).toFixed(1)} años`;
         dict["anual_pay_solar"] = formatter.format(parseFloat(this.state.totals[4]));
         dict["anual_pay_actual"] = formatter.format(parseFloat(this.state.totals[3]));
         dict["savings_chart"] = dict["savings"];
@@ -267,7 +263,7 @@ class EntireForm extends React.Component {
             new_value = Math.round(parseFloat(row["hours"])*parseFloat(this.state.sistema_solar)*parseFloat(this.state.eficiencia)*31);
             new_totals[2] = this.calculateNewTotal("production", row.month, new_value);
             if (row.pay_before) {
-                let payAfter = this.calculatePayAfter(row);
+                let payAfter = this.calculatePayAfter(row, row.pay_before, new_value);
                 new_totals[4] = this.calculateNewTotal("pay_after", row.month, payAfter);
                 this.setState(oldState => ({
                     totals: new_totals,
@@ -293,26 +289,26 @@ class EntireForm extends React.Component {
         let overhead = 0;
         let to_pay = 0;
         let tmp_row = {
-            bajo: consume > this.pay_before_temps[months_temp[row.month]].cantidad_bajo? this.pay_before_temps[months_temp[row.month]].cantidad_bajo : 0,
+            bajo: consume > this.pay_before_temps[months_temp.get(row.month)].cantidad_bajo? this.pay_before_temps[months_temp.get(row.month)].cantidad_bajo : 0,
             intermedio: 0,
             intermedio_alto: 0
         }
-        if (months_temp[row.month] === 0) {
-            tmp_row.intermedio = consume - tmp_row.bajo > 150 ? this.pay_before_temps[0].intermedio : 0;
+        if (months_temp.get(row.month) === 0) {
+            tmp_row.intermedio = (consume - tmp_row.bajo > 125) ? this.pay_before_temps[0].cantidad_intermedio : 0;
             let bi = tmp_row.intermedio + tmp_row.bajo;
             overhead = consume > bi ? consume - bi : 0;
-            to_pay = this.pay_before_temps[0].consumo_bajo*tmp_row.bajo + this.pay_before_temps[0].intermedio*tmp_row.intermedio + this.pay_before_temps[0].excedente*overhead;
+            to_pay = this.pay_before_temps[0].bajo*tmp_row.bajo + this.pay_before_temps[0].intermedio*tmp_row.intermedio + this.pay_before_temps[0].excedente*overhead;
         } else {
-            tmp_row.intermedio = consume - tmp_row.bajo > 300 ? this.pay_before_temps[1].intermedio : consume - tmp_row.bajo;
-            tmp_row.intermedio_alto = Math.max(consume - tmp_row.bajo - tmp_row.intermedio, this.pay_before_temps[1].cantidad_intermedio_alto);
+            tmp_row.intermedio = consume - tmp_row.bajo > 300 ? this.pay_before_temps[1].cantidad_intermedio : consume - tmp_row.bajo;
+            tmp_row.intermedio_alto = Math.min(consume - tmp_row.bajo - tmp_row.intermedio, this.pay_before_temps[1].cantidad_intermedio_alto);
             let bii = tmp_row.intermedio + tmp_row.intermedio_alto + tmp_row.bajo;
-            overhead = consume > bii ? consume - bii : 0;
-            to_pay = this.pay_before_temps[1].consumo_bajo*tmp_row.bajo + this.pay_before_temps[1].intermedio*tmp_row.intermedio + this.pay_before_temps[1].excedente*overhead + this.pay_before_temps[1].intermedio_alto*tmp_row.intermedio_alto;
+            overhead = consume > bii ? consume - tmp_row.intermedio_alto : 0;
+            to_pay = this.pay_before_temps[1].bajo*tmp_row.bajo + this.pay_before_temps[1].intermedio*tmp_row.intermedio + this.pay_before_temps[1].excedente*overhead + this.pay_before_temps[1].intermedio_alto*tmp_row.intermedio_alto;
         };
         let new_value = Math.round(to_pay);
         new_totals[3] = this.calculateNewTotal("pay_before", row.month, new_value);
-        if (row.production>1000000) {
-            let payAfter = this.calculatePayAfter(row);
+        if (row.production) {
+            let payAfter = this.calculatePayAfter(row, new_value, row.production);
             new_totals[4] = this.calculateNewTotal("pay_after", row.month, payAfter);
             this.setState(oldState => ({
                 totals: new_totals,
@@ -330,8 +326,30 @@ class EntireForm extends React.Component {
         }
     }
 
-    calculatePayAfter(row) {
-
+    calculatePayAfter(row, pay_before, production) {
+        let consume = parseFloat(production);
+        let overhead = 0;
+        let to_pay = 0;
+        console.log(row)
+        let tmp_row = {
+            bajo: consume > this.pay_before_temps[months_temp.get(row.month)].cantidad_bajo? this.pay_before_temps[months_temp.get(row.month)].cantidad_bajo : 0,
+            intermedio: 0,
+            intermedio_alto: 0
+        }
+        if (months_temp.get(row.month) === 0) {
+            tmp_row.intermedio = (consume - tmp_row.bajo > 125) ? this.pay_before_temps[0].cantidad_intermedio : consume - tmp_row.bajo;
+            let bi = tmp_row.intermedio + tmp_row.bajo;
+            overhead = consume > bi ? consume - bi : 0;
+            to_pay = this.pay_before_temps[0].bajo*tmp_row.bajo + this.pay_before_temps[0].intermedio*tmp_row.intermedio + this.pay_before_temps[0].excedente*overhead;
+        } else {
+            tmp_row.intermedio = consume - tmp_row.bajo > 300 ? this.pay_before_temps[1].cantidad_intermedio : consume - tmp_row.bajo;
+            tmp_row.intermedio_alto = Math.min(consume - tmp_row.bajo - tmp_row.intermedio, this.pay_before_temps[1].cantidad_intermedio_alto);
+            let bii = tmp_row.intermedio + tmp_row.intermedio_alto + tmp_row.bajo;
+            overhead = consume > bii ? consume - tmp_row.intermedio + tmp_row.bajo : 0;
+            to_pay = this.pay_before_temps[1].bajo*tmp_row.bajo + this.pay_before_temps[1].intermedio*tmp_row.intermedio + this.pay_before_temps[1].excedente*overhead + this.pay_before_temps[1].intermedio_alto*tmp_row.intermedio_alto;
+        };
+        console.log(to_pay)
+        return pay_before - Math.round(to_pay);
     }
 
     calculateNewTotal(column, month, value) {
@@ -353,25 +371,11 @@ class EntireForm extends React.Component {
         switch(column) {
             case 'hours':
                 new_totals[0] = (total/12.0).toFixed(2);
-                //this.calculateProduction(row, new_totals);
-                this.setState({totals: new_totals});
+                this.calculateProduction(row, new_totals);
                 break;
             case 'consume':
                 new_totals[1] = (total).toFixed(2);
-                //this.calculatePayBefore(row, new_totals);
-                this.setState({totals: new_totals});
-                break;
-            case 'pay_before':
-                new_totals[3] = (total).toFixed(2);
-                this.setState({totals: new_totals});
-                break;
-            case 'pay_after':
-                new_totals[4] = (total).toFixed(2);
-                this.setState({totals: new_totals});
-                break;
-            case 'production':
-                new_totals[2] = (total).toFixed(2);
-                this.setState({totals: new_totals});
+                this.calculatePayBefore(row, new_totals);
                 break;
         }
     }
@@ -404,9 +408,9 @@ class EntireForm extends React.Component {
                         <TableHeaderColumn dataField='month' isKey>Mes</TableHeaderColumn>
                         <TableHeaderColumn dataField='hours'>Horas de irradiación</TableHeaderColumn>
                         <TableHeaderColumn dataField='consume'>Consumo</TableHeaderColumn>
-                        <TableHeaderColumn dataField='production' editable={true}>Producción</TableHeaderColumn>
-                        <TableHeaderColumn dataField='pay_before' editable={true}>Pago antes</TableHeaderColumn>
-                        <TableHeaderColumn dataField='pay_after' editable={true}>Pago con energía solar</TableHeaderColumn>
+                        <TableHeaderColumn dataField='production' editable={false}>Producción</TableHeaderColumn>
+                        <TableHeaderColumn dataField='pay_before' editable={false}>Pago antes</TableHeaderColumn>
+                        <TableHeaderColumn dataField='pay_after' editable={false}>Pago con energía solar</TableHeaderColumn>
                     </BootstrapTable>
                         <table className="table">
                             <thead className="thead-light">

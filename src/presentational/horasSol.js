@@ -1,0 +1,58 @@
+export const sun = {
+    hermosillo: {
+        Enero: 5.26,
+        Febrero: 5.67,
+        Marzo: 7.01,
+        Abril: 7.24,
+        Mayo: 6.98,
+        Junio: 6.7,
+        Julio: 5.98,
+        Agosto: 5.85,
+        Septiembre: 6.16,
+        Octubre: 6.21,
+        Noviembre: 5.65,
+        Diciembre: 5.12
+    },
+    obregon:{
+        Enero: 5.46,
+        Febrero: 5.88,
+        Marzo: 7.12,
+        Abril: 7.13,
+        Mayo: 7.05,
+        Junio: 6.59,
+        Julio: 5.92,
+        Agosto: 5.82,
+        Septiembre: 6.17,
+        Octubre: 6.2,
+        Noviembre: 5.74,
+        Diciembre: 5.23
+    },
+    nogales: {
+        Enero: 5.15,
+        Febrero: 5.51,
+        Marzo: 6.89,
+        Abril: 7.25,
+        Mayo: 7.15,
+        Junio: 6.73,
+        Julio: 5.64,
+        Agosto: 5.54,
+        Septiembre: 6.04,
+        Octubre: 6.02,
+        Noviembre: 5.57,
+        Diciembre: 5.01
+    },
+    guaymas:{
+        Enero: 5.46,
+        Febrero: 5.88,
+        Marzo: 7.12,
+        Abril: 7.13,
+        Mayo: 7.05,
+        Junio: 6.59,
+        Julio: 5.92,
+        Agosto: 5.82,
+        Septiembre: 6.17,
+        Octubre: 6.2,
+        Noviembre: 5.74,
+        Diciembre: 5.23
+    },
+};
