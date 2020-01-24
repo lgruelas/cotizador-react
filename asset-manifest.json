@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/cotizador-react/static/css/main.abebb69a.chunk.css",
-    "main.js": "/cotizador-react/static/js/main.f4d9f028.chunk.js",
-    "main.js.map": "/cotizador-react/static/js/main.f4d9f028.chunk.js.map",
+    "main.js": "/cotizador-react/static/js/main.c072f5f0.chunk.js",
+    "main.js.map": "/cotizador-react/static/js/main.c072f5f0.chunk.js.map",
     "runtime-main.js": "/cotizador-react/static/js/runtime-main.9fa3744d.js",
     "runtime-main.js.map": "/cotizador-react/static/js/runtime-main.9fa3744d.js.map",
     "static/css/2.9ecc95fd.chunk.css": "/cotizador-react/static/css/2.9ecc95fd.chunk.css",
     "static/js/2.914b0ba5.chunk.js": "/cotizador-react/static/js/2.914b0ba5.chunk.js",
     "static/js/2.914b0ba5.chunk.js.map": "/cotizador-react/static/js/2.914b0ba5.chunk.js.map",
     "index.html": "/cotizador-react/index.html",
-    "precache-manifest.b6baecfa9246443208b4695778ca337f.js": "/cotizador-react/precache-manifest.b6baecfa9246443208b4695778ca337f.js",
+    "precache-manifest.54ffe6e55898b3c69eba3a1904a56d31.js": "/cotizador-react/precache-manifest.54ffe6e55898b3c69eba3a1904a56d31.js",
     "service-worker.js": "/cotizador-react/service-worker.js",
     "static/css/2.9ecc95fd.chunk.css.map": "/cotizador-react/static/css/2.9ecc95fd.chunk.css.map",
     "static/css/main.abebb69a.chunk.css.map": "/cotizador-react/static/css/main.abebb69a.chunk.css.map",
@@ -21,6 +21,6 @@
     "static/css/2.9ecc95fd.chunk.css",
     "static/js/2.914b0ba5.chunk.js",
     "static/css/main.abebb69a.chunk.css",
-    "static/js/main.f4d9f028.chunk.js"
+    "static/js/main.c072f5f0.chunk.js"
   ]
 }
