@@ -27,9 +27,10 @@ class EntireForm extends React.Component {
             quote5: "",
             total: "",
             savings: "",
+            adress: "",
             anual: "25 años",
-            sistema_solar: "",
-            eficiencia: "",
+            sistema_solar: 0,
+            eficiencia: 0,
             invest_return: "",
             client: "",
             service: "",
@@ -66,87 +67,76 @@ class EntireForm extends React.Component {
             quantity7: "",
             description7: "",
             panel_quantity: "",
+            city: "hermosillo",
             table: [
                 {
                     month: 'Enero',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Febrero',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Marzo',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Abril',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Mayo',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Junio',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Julio',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Agosto',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Septiembre',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Octubre',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Noviembre',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
                     pay_after: ''
                 },{
                     month: 'Diciembre',
-                    hours: '',
                     consume: '',
                     production: '',
                     pay_before: '',
@@ -157,10 +147,10 @@ class EntireForm extends React.Component {
             tarifa: "1"
         }
         this.pay_before_temps = pay_before_temp_costs_domestic_1;
-        console.log(this.pay_before_table)
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeSelect = this.handleChangeSelect.bind(this);
+        this.handleChangeCity = this.handleChangeCity.bind(this);
     }
 
     componentDidMount() {
@@ -225,10 +215,9 @@ class EntireForm extends React.Component {
     handleSubmit() {
         let to_send = {...this.state};
         to_send.table = this.state.table.map(e => ({...e}));
-        to_send.totals = this.state.totals.map(e => ({...e}))
-
+        to_send.totals = [...this.state.totals];
         this.format_output(to_send);
-        axios.post(`https://57d3a4c2.ngrok.io/generate`, to_send, {
+        axios.post(`http://localhost:5000/generate`, to_send, {
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow_Origin': '*',
@@ -248,40 +237,44 @@ class EntireForm extends React.Component {
     };
 
     handleChange(e) {
-        if (e.target.id === 'quote' ) {
+        if ( e.target.id === 'quote' ) {
             for (let i = 1; i <= 5; i++) {
                 this.setState({[`${e.target.id}${i}`]: `No. de cotización: ${e.target.value}`});
             }
+        } else if (e.target.id === 'eficiencia') {
+            if(this.state.sistema_solar) {
+                this.setState({[e.target.id]: parseFloat(e.target.value)}, () => {this.calculateProduction([...this.state.totals])});
+            } else {
+                this.setState({[e.target.id]: parseFloat(e.target.value)});
+            };
+        } else if (e.target.id === 'sistema_solar') {
+            if(this.state.eficiencia) {
+                this.setState({[e.target.id]: parseFloat(e.target.value)}, () => {this.calculateProduction([...this.state.totals])});
+            } else {
+                this.setState({[e.target.id]: parseFloat(e.target.value)});
+            };
         } else {
             this.setState({[e.target.id]: e.target.value});
         }
     }
 
-    calculateProduction(row, new_totals) {
-        if (this.state.sistema_solar && this.state.eficiencia) {
-            let new_value = "";
-            new_value = Math.round(parseFloat(row["hours"])*parseFloat(this.state.sistema_solar)*parseFloat(this.state.eficiencia)*31);
-            new_totals[2] = this.calculateNewTotal("production", row.month, new_value);
-            if (row.pay_before) {
-                let payAfter = this.calculatePayAfter(row, row.pay_before, new_value);
-                new_totals[4] = this.calculateNewTotal("pay_after", row.month, payAfter);
-                this.setState(oldState => ({
-                    totals: new_totals,
-                    table: oldState.table.map(
-                        el => el.month === row.month? { ...el, production: new_value , pay_after: payAfter }: el
-                    )
-                }));
-            } else {
-                this.setState(oldState => ({
-                    totals: new_totals,
-                    table: oldState.table.map(
-                        el => el.month === row.month? { ...el, production: new_value }: el
-                    )
-                }));
+    calculateProduction(new_totals) {
+        let new_table = this.state.table.map(e => ({...e}));
+        let new_value = 0;
+        let checked = false;
+        new_table.forEach(element => {
+            new_value = Math.round(sun[this.state.city][element.month]*this.state.sistema_solar*this.state.eficiencia*31);
+            element.production = new_value;
+            if (element.pay_before) {
+                checked = true;
+                element.pay_after = this.calculatePayAfter(element, element.pay_before, new_value);
             }
-        } else {
-            this.setState({totals: new_totals});
-        }
+        });
+        if(checked) {
+            new_totals[4] = this.calculateNewTotal("pay_after", new_table);
+        };
+        new_totals[2] = this.calculateNewTotal("production", new_table);
+        this.setState({table: new_table, totals: new_totals});
     }
 
     calculatePayBefore(row, new_totals) {
@@ -306,10 +299,10 @@ class EntireForm extends React.Component {
             to_pay = this.pay_before_temps[1].bajo*tmp_row.bajo + this.pay_before_temps[1].intermedio*tmp_row.intermedio + this.pay_before_temps[1].excedente*overhead + this.pay_before_temps[1].intermedio_alto*tmp_row.intermedio_alto;
         };
         let new_value = Math.round(to_pay);
-        new_totals[3] = this.calculateNewTotal("pay_before", row.month, new_value);
+        new_totals[3] = this.calculateNewTotal("pay_before", this.state.table, row.month, new_value);
         if (row.production) {
             let payAfter = this.calculatePayAfter(row, new_value, row.production);
-            new_totals[4] = this.calculateNewTotal("pay_after", row.month, payAfter);
+            new_totals[4] = this.calculateNewTotal("pay_after", this.state.table, row.month, payAfter);
             this.setState(oldState => ({
                 totals: new_totals,
                 table: oldState.table.map(
@@ -330,7 +323,6 @@ class EntireForm extends React.Component {
         let consume = parseFloat(production);
         let overhead = 0;
         let to_pay = 0;
-        console.log(row)
         let tmp_row = {
             bajo: consume > this.pay_before_temps[months_temp.get(row.month)].cantidad_bajo? this.pay_before_temps[months_temp.get(row.month)].cantidad_bajo : 0,
             intermedio: 0,
@@ -348,14 +340,13 @@ class EntireForm extends React.Component {
             overhead = consume > bii ? consume - tmp_row.intermedio + tmp_row.bajo : 0;
             to_pay = this.pay_before_temps[1].bajo*tmp_row.bajo + this.pay_before_temps[1].intermedio*tmp_row.intermedio + this.pay_before_temps[1].excedente*overhead + this.pay_before_temps[1].intermedio_alto*tmp_row.intermedio_alto;
         };
-        console.log(to_pay)
         return pay_before - Math.round(to_pay);
     }
 
-    calculateNewTotal(column, month, value) {
+    calculateNewTotal(column, table, month, value) {
         month = month || "not_assigned";
         let total = 0;
-        this.state.table.forEach(element => {
+        table.forEach(element => {
             if (element.month === month) {
                 total += value;
             } else if (element[column]) {
@@ -367,12 +358,8 @@ class EntireForm extends React.Component {
 
     forceUpdate(row, column) {
         let new_totals = this.state.totals;
-        let total = this.calculateNewTotal(column);
+        let total = this.calculateNewTotal(column, this.state.table);
         switch(column) {
-            case 'hours':
-                new_totals[0] = (total/12.0).toFixed(2);
-                this.calculateProduction(row, new_totals);
-                break;
             case 'consume':
                 new_totals[1] = (total).toFixed(2);
                 this.calculatePayBefore(row, new_totals);
@@ -391,6 +378,14 @@ class EntireForm extends React.Component {
         }));
     }
 
+    handleChangeCity(e) {
+        if (this.state.sistema_solar && this.state.eficiencia) {
+            this.setState({city: e.target.value}, () => {this.calculateProduction([...this.state.totals])});
+        } else {
+            this.setState({city: e.target.value});
+        };
+    }
+
     render() {
         const cellEditProp = {
             mode: 'click',
@@ -406,7 +401,6 @@ class EntireForm extends React.Component {
                     <div className="col-md-8 order-md-2 mb-4">
                     <BootstrapTable data={ this.state.table } tableHeaderClass={"thead-dark"} cellEdit={cellEditProp}>
                         <TableHeaderColumn dataField='month' isKey>Mes</TableHeaderColumn>
-                        <TableHeaderColumn dataField='hours'>Horas de irradiación</TableHeaderColumn>
                         <TableHeaderColumn dataField='consume'>Consumo</TableHeaderColumn>
                         <TableHeaderColumn dataField='production' editable={false}>Producción</TableHeaderColumn>
                         <TableHeaderColumn dataField='pay_before' editable={false}>Pago antes</TableHeaderColumn>
@@ -416,7 +410,6 @@ class EntireForm extends React.Component {
                             <thead className="thead-light">
                                 <tr>
                                     <th scope="col">Total</th>
-                                    <th scope="col">{this.state.totals[0]}</th>
                                     <th scope="col">{this.state.totals[1]}</th>
                                     <th scope="col">{this.state.totals[2]}</th>
                                     <th scope="col">{this.state.totals[3]}</th>
@@ -440,15 +433,22 @@ class EntireForm extends React.Component {
                             <FormControl onChange={this.handleChange} value={this.state.client} id="client" />
                         </InputGroup>
 
-                        <label htmlFor="direccion">Direccion</label>
+                        <label htmlFor="adress">Direccion</label>
                         <InputGroup className="mb-3">
-                            <FormControl id="direccion" />
+                            <FormControl id="adress" onChange={this.handleChange} value={this.state.adress}/>
                         </InputGroup>
 
-                        <label htmlFor="city">Ciudad</label>
-                        <InputGroup className="mb-3">
-                            <FormControl id="city"/>
-                        </InputGroup>
+                        <div className="row">
+                            <div className="col-md-12 mb-3">
+                                <label htmlFor="city">Ciudad</label>
+                                <select onChange={this.handleChangeCity} value={this.state.city} id="city" className="browser-default custom-select">
+                                    <option value="hermosillo">Hermosillo</option>
+                                    <option value="guaymas">Guaymas</option>
+                                    <option value="nogales">Nogales</option>
+                                    <option value="obregon">Obregon</option>
+                                </select>
+                            </div>
+                        </div>
 
                         <div className="row">
                             <div className="col-md-6 mb-3">
@@ -486,13 +486,13 @@ class EntireForm extends React.Component {
                             <div className="col-md-6 mb-3">
                                 <label htmlFor="sistema_solar">Sistema solar</label>
                                 <InputGroup className="mb-3">
-                                    <FormControl onChange={this.handleChange} id="sistema_solar" />
+                                    <FormControl onChange={this.handleChange} type="number" step="any" id="sistema_solar" />
                                 </InputGroup>
                             </div>
                             <div className="col-md-6 mb-3">
                                 <label htmlFor="eficiencia">Eficienca</label>
                                 <InputGroup className="mb-3">
-                                    <FormControl onChange={this.handleChange} id="eficiencia" />
+                                    <FormControl onChange={this.handleChange} type="number" step="any" id="eficiencia" />
                                 </InputGroup>
                             </div>
                         </div>
