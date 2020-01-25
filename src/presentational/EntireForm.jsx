@@ -217,7 +217,7 @@ class EntireForm extends React.Component {
         to_send.table = this.state.table.map(e => ({...e}));
         to_send.totals = [...this.state.totals];
         this.format_output(to_send);
-        axios.post(`http://localhost:5000/generate`, to_send, {
+        axios.post(`https://0d5d1131.ngrok.io/generate`, to_send, {
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow_Origin': '*',
@@ -241,7 +241,7 @@ class EntireForm extends React.Component {
             for (let i = 1; i <= 5; i++) {
                 this.setState({[`${e.target.id}${i}`]: `No. de cotización: ${e.target.value}`});
             }
-        } else if (e.target.id === 'eficiencia') {
+        } /*else if (e.target.id === 'eficiencia') {
             if(this.state.sistema_solar) {
                 this.setState({[e.target.id]: parseFloat(e.target.value)}, () => {this.calculateProduction([...this.state.totals])});
             } else {
@@ -253,7 +253,7 @@ class EntireForm extends React.Component {
             } else {
                 this.setState({[e.target.id]: parseFloat(e.target.value)});
             };
-        } else {
+        } */else {
             this.setState({[e.target.id]: e.target.value});
         }
     }
@@ -362,9 +362,19 @@ class EntireForm extends React.Component {
         switch(column) {
             case 'consume':
                 new_totals[1] = (total).toFixed(2);
-                this.calculatePayBefore(row, new_totals);
+                //this.calculatePayBefore(row, new_totals);
+                break;
+            case 'production':
+                new_totals[2] = (total).toFixed(2);
+                break;
+            case 'pay_before':
+                new_totals[3] = (total).toFixed(2);
+                break;
+            case 'pay_after':
+                new_totals[4] = (total).toFixed(2);
                 break;
         }
+        this.setState({totals: new_totals})
     }
 
     handleChangeSelect(e) {
@@ -379,11 +389,12 @@ class EntireForm extends React.Component {
     }
 
     handleChangeCity(e) {
-        if (this.state.sistema_solar && this.state.eficiencia) {
+        /*if (this.state.sistema_solar && this.state.eficiencia) {
             this.setState({city: e.target.value}, () => {this.calculateProduction([...this.state.totals])});
         } else {
             this.setState({city: e.target.value});
-        };
+        };*/
+        this.setState({city: e.target.value});
     }
 
     render() {
@@ -402,9 +413,9 @@ class EntireForm extends React.Component {
                     <BootstrapTable data={ this.state.table } tableHeaderClass={"thead-dark"} cellEdit={cellEditProp}>
                         <TableHeaderColumn dataField='month' isKey>Mes</TableHeaderColumn>
                         <TableHeaderColumn dataField='consume'>Consumo</TableHeaderColumn>
-                        <TableHeaderColumn dataField='production' editable={false}>Producción</TableHeaderColumn>
-                        <TableHeaderColumn dataField='pay_before' editable={false}>Pago antes</TableHeaderColumn>
-                        <TableHeaderColumn dataField='pay_after' editable={false}>Pago con energía solar</TableHeaderColumn>
+                        <TableHeaderColumn dataField='production' editable={true}>Producción</TableHeaderColumn>
+                        <TableHeaderColumn dataField='pay_before' editable={true}>Pago antes</TableHeaderColumn>
+                        <TableHeaderColumn dataField='pay_after' editable={true}>Pago con energía solar</TableHeaderColumn>
                     </BootstrapTable>
                         <table className="table">
                             <thead className="thead-light">
