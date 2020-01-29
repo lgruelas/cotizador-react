@@ -52,6 +52,7 @@ class EntireForm extends React.Component {
             total_mxn: "",
             currency_rate: "",
             usd_rate: 0,
+            savings_proportion_small: "",
             quantity1: "",
             description1: "",
             quantity2: "",
@@ -191,6 +192,7 @@ class EntireForm extends React.Component {
         dict["anual_pay_actual"] = formatter.format(parseFloat(this.state.totals[3]));
         dict["savings_chart"] = dict["savings"];
         dict["savings_proportion"] = `${Math.round((savings/parseFloat(this.state.totals[3]))*100)}%`;
+        dict["savings_proportion_small"] = dict["savings_proportion"]
         dict["invest_return_big"] = dict["invest_return"];
         this.formatDictTable(dict["table"], formatter);
         this.formatDictTotals(dict["totals"], formatter);
@@ -217,13 +219,16 @@ class EntireForm extends React.Component {
         to_send.table = this.state.table.map(e => ({...e}));
         to_send.totals = [...this.state.totals];
         this.format_output(to_send);
-        axios.post(`https://0d5d1131.ngrok.io/generate`, to_send, {
+        let url = "https://us-central1-cotizador-cia-energia.cloudfunctions.net/pdf-generate";
+        axios.post( url, to_send, {
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow_Origin': '*',
+                'Accept': 'application/json',
                 'Content-Disposition': 'attachment; filename="cotizacion.pdf"',
                 'Content-Transfer-Encoding': 'binary'
             },
+            crossDomain: true,
             responseType: 'blob'
         })
         .then(response => {
@@ -233,6 +238,9 @@ class EntireForm extends React.Component {
             link.setAttribute('download', 'cotizacion.pdf');
             document.body.appendChild(link);
             link.click();
+        })
+        .catch(error => {
+            console.log(error)
         })
     };
 
