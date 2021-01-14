@@ -1,26 +1,26 @@
 {
   "files": {
     "main.css": "/cotizador-react/static/css/main.abebb69a.chunk.css",
-    "main.js": "/cotizador-react/static/js/main.2ebf7439.chunk.js",
-    "main.js.map": "/cotizador-react/static/js/main.2ebf7439.chunk.js.map",
+    "main.js": "/cotizador-react/static/js/main.51e360c4.chunk.js",
+    "main.js.map": "/cotizador-react/static/js/main.51e360c4.chunk.js.map",
     "runtime-main.js": "/cotizador-react/static/js/runtime-main.9fa3744d.js",
     "runtime-main.js.map": "/cotizador-react/static/js/runtime-main.9fa3744d.js.map",
-    "static/css/2.9ecc95fd.chunk.css": "/cotizador-react/static/css/2.9ecc95fd.chunk.css",
-    "static/js/2.e937eb76.chunk.js": "/cotizador-react/static/js/2.e937eb76.chunk.js",
-    "static/js/2.e937eb76.chunk.js.map": "/cotizador-react/static/js/2.e937eb76.chunk.js.map",
+    "static/css/2.0b55fbba.chunk.css": "/cotizador-react/static/css/2.0b55fbba.chunk.css",
+    "static/js/2.6a479685.chunk.js": "/cotizador-react/static/js/2.6a479685.chunk.js",
+    "static/js/2.6a479685.chunk.js.map": "/cotizador-react/static/js/2.6a479685.chunk.js.map",
     "index.html": "/cotizador-react/index.html",
-    "precache-manifest.9662b5fbc1d806dcec442fecebafbac8.js": "/cotizador-react/precache-manifest.9662b5fbc1d806dcec442fecebafbac8.js",
+    "precache-manifest.80c086448126b29ce12370ed04c4bfe0.js": "/cotizador-react/precache-manifest.80c086448126b29ce12370ed04c4bfe0.js",
     "service-worker.js": "/cotizador-react/service-worker.js",
-    "static/css/2.9ecc95fd.chunk.css.map": "/cotizador-react/static/css/2.9ecc95fd.chunk.css.map",
+    "static/css/2.0b55fbba.chunk.css.map": "/cotizador-react/static/css/2.0b55fbba.chunk.css.map",
     "static/css/main.abebb69a.chunk.css.map": "/cotizador-react/static/css/main.abebb69a.chunk.css.map",
-    "static/js/2.e937eb76.chunk.js.LICENSE": "/cotizador-react/static/js/2.e937eb76.chunk.js.LICENSE",
+    "static/js/2.6a479685.chunk.js.LICENSE": "/cotizador-react/static/js/2.6a479685.chunk.js.LICENSE",
     "static/media/planet.png": "/cotizador-react/static/media/planet.2e71a093.png"
   },
   "entrypoints": [
     "static/js/runtime-main.9fa3744d.js",
-    "static/css/2.9ecc95fd.chunk.css",
-    "static/js/2.e937eb76.chunk.js",
+    "static/css/2.0b55fbba.chunk.css",
+    "static/js/2.6a479685.chunk.js",
     "static/css/main.abebb69a.chunk.css",
-    "static/js/main.2ebf7439.chunk.js"
+    "static/js/main.51e360c4.chunk.js"
   ]
 }

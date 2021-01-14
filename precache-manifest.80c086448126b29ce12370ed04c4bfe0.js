@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "2c85ab745efdadd5f359571c2f7db810",
+    "revision": "cfa58e5b122e2539cd09dc8a7a046231",
     "url": "/cotizador-react/index.html"
   },
   {
-    "revision": "c2bd705a9f3e3e049bed",
-    "url": "/cotizador-react/static/css/2.9ecc95fd.chunk.css"
+    "revision": "947741729dd380ddfb35",
+    "url": "/cotizador-react/static/css/2.0b55fbba.chunk.css"
   },
   {
-    "revision": "4d467a2f72f418572205",
+    "revision": "1a850bbebbf171e96106",
     "url": "/cotizador-react/static/css/main.abebb69a.chunk.css"
   },
   {
-    "revision": "c2bd705a9f3e3e049bed",
-    "url": "/cotizador-react/static/js/2.e937eb76.chunk.js"
+    "revision": "947741729dd380ddfb35",
+    "url": "/cotizador-react/static/js/2.6a479685.chunk.js"
   },
   {
     "revision": "a98cc4b211015b4f184ab89a98b37528",
-    "url": "/cotizador-react/static/js/2.e937eb76.chunk.js.LICENSE"
+    "url": "/cotizador-react/static/js/2.6a479685.chunk.js.LICENSE"
   },
   {
-    "revision": "4d467a2f72f418572205",
-    "url": "/cotizador-react/static/js/main.2ebf7439.chunk.js"
+    "revision": "1a850bbebbf171e96106",
+    "url": "/cotizador-react/static/js/main.51e360c4.chunk.js"
   },
   {
     "revision": "b60088a2ef1aa1d847f8",
